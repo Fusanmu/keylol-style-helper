@@ -40,7 +40,8 @@
 ## 安装
 
 1. 先装 [Tampermonkey](https://www.tampermonkey.net/) 浏览器扩展
-2. 打开 [`Keylol样式面板.user.js`](./Keylol样式面板.user.js)，点 Tampermonkey 的「安装」；或把文件拖进 Tampermonkey 的「实用工具 → 导入」
+2. **[点此安装脚本](https://raw.githubusercontent.com/Fusanmu/keylol-style-helper/main/Keylol%E6%A0%B7%E5%BC%8F%E9%9D%A2%E6%9D%BF.user.js)** —— 装好 Tampermonkey 后点这个链接，会自动弹出安装界面，点「安装」即可
+3. 如果没弹出安装界面（比如还没装 Tampermonkey）：右键链接选「另存为」把 `.user.js` 下载下来，再拖进 Tampermonkey 的「实用工具 → 导入」
 
 ## 使用提示
 
