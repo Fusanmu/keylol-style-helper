@@ -1,0 +1,17 @@
+# AI 助手的工作数据（本地记忆日志，不进仓库）
+.workbuddy-ai/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+
+# Node
+node_modules/
+npm-debug.log*
+
+# 临时文件
+*.tmp
+*.bak
+*~

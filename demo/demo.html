@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>其乐样式助手 · 本地演示</title>
+<style>
+  body{margin:0;background:#eef1f5;font:13px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#2b3440}
+  .topbar{height:44px;background:#2f6fb5;color:#fff;display:flex;align-items:center;padding:0 18px;font-weight:600}
+  .wrap{max-width:980px;margin:16px auto;padding:0 18px}
+  .card{background:#fff;border:1px solid #dde3ea;border-radius:8px;padding:14px 16px;margin-bottom:14px}
+  .row{margin-bottom:10px}
+  input.px,textarea.pt{width:100%;padding:8px;border:1px solid #d6dce5;border-radius:5px;font:13px/1.6 inherit}
+  textarea.pt{min-height:200px;resize:vertical}
+  .bar{display:flex;gap:8px;align-items:center;padding:6px 8px;background:#f6f9fd;border:1px solid #dde3ea;
+       border-bottom:0;border-radius:5px 5px 0 0;color:#6b7686;font-size:12px}
+  .area{border:1px solid #d6dce5;border-radius:0 0 5px 5px;padding:6px}
+  .area textarea{border:0;outline:none;width:100%}
+  .mode{margin-left:auto}
+  .mode button,.scene-bar button{padding:3px 10px;border:1px solid #c9d6e8;background:#fff;color:#2f6fb5;
+       border-radius:4px;cursor:pointer;font-size:12px}
+  .scene-bar button.on{background:#2f6fb5;color:#fff;border-color:#2f6fb5}
+  h2{font-size:14px;margin:0 0 8px;color:#2f6fb5}
+  .hint{font-size:12px;color:#7b8798;background:#f8fafc;border-left:3px solid #c9d6e8;padding:8px 10px;margin-bottom:12px}
+  .scene-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid #dde3ea;
+       border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#6b7686}
+  .scene-bar .sep{color:#d6dce5}
+  .post-body{padding:10px 0;line-height:1.9}
+  .post-meta{font-size:12px;color:#98a2b3;margin-bottom:6px}
+  .fr{border:1px solid #dde3ea;border-radius:6px;padding:10px}
+  /* 模拟其乐「带祖先限定」的真实标题 CSS —— 预览框不在 .t_f 里，
+     靠标签+class 是命不中的，必须走「抽规则内联」才能出效果 */
+  .t_f h3.KyloStylisedHeader2{font-size:20px;font-weight:700;color:#c0392b;
+       border-bottom:2px solid #c0392b;padding:2px 0;letter-spacing:1px}
+  .t_f h1.KyloStylisedHeader0{font-size:24px;font-weight:700;color:#1f4e79;
+       border-top:2px solid #1f4e79;border-bottom:2px solid #1f4e79;padding:6px 0}
+</style>
+</head>
+<body>
+<div class="topbar">其乐 Keylol · 本地演示页（非真实论坛）</div>
+
+<div class="wrap">
+  <div class="scene-bar">
+    <span>场景：</span>
+    <button type="button" id="btnScenePost">发帖页（?mod=post）</button>
+    <button type="button" id="btnSceneView">浏览帖子页</button>
+    <span class="sep">|</span>
+    <span>样式：</span>
+    <button type="button" id="btnLoadEx">载入示例样式</button>
+    <button type="button" id="btnClearEx">清空样式</button>
+    <span class="sep">|</span>
+    <span>编辑器模式：</span>
+    <button type="button" id="btnMode">切换到所见即所得</button>
+  </div>
+
+  <div class="hint" id="sceneHint"></div>
+
+  <!-- ============ 场景一：发帖页（脚本应当注入） ============ -->
+  <div id="scenePost">
+    <div class="card">
+      <form id="postform" name="postform">
+        <div class="row"><input id="subject" class="px" placeholder="帖子标题" value="【测试】样式面板"></div>
+        <div class="tedt mtn">
+          <div class="bar">
+            <span>字体</span><span>B</span><span>I</span><span>U</span><span>表情</span><span>图片</span>
+            <span class="mode">当前模式：<b id="mode">纯文本</b></span>
+          </div>
+          <div class="area">
+            <textarea id="e" class="pt" name="message" rows="11">这是一段示例正文，选中我试试左侧的样式按钮。
+第二段文字用来测试区块样式。</textarea>
+            <iframe id="e_iframe" style="display:none;width:100%;height:200px;border:0"></iframe>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>BBCode 源码</h2>
+      <pre id="src" style="white-space:pre-wrap;background:#f6f8fa;padding:10px;border-radius:5px;margin:0"></pre>
+    </div>
+    <div class="card">
+      <h2>渲染预览</h2>
+      <div id="preview"></div>
+    </div>
+  </div>
+
+  <!-- ============ 场景二：浏览帖子页（不注入面板，但可用吸取样式） ============ -->
+  <div id="sceneView" style="display:none">
+    <div class="card">
+      <div class="post-meta">楼主 · 发表于 2026-9-28 · 1 楼</div>
+      <!-- .t_f / id^=postmessage_ 就是 Discuz 帖子正文容器，格式刷只在这个范围里响应 -->
+      <div class="t_f" id="postmessage_1001" style="font-size:16px;line-height:1.95">
+        这是一段正文。<b>加粗的字</b>，<font color="#c0392b">红色的字</font>，
+        <span style="background-color:#ffe58f">高亮背景的字</span>，
+        <span style="text-decoration:underline">下划线的字</span>，
+        <span style="color:#2980b9;font-weight:700">又蓝又粗的字</span>。
+        <div><font size="5"><b>这是大号标题字</b></font></div>
+        <div style="text-align:center">这一行是居中的</div>
+        <div><span class="plain-sample">这是一段没有任何格式的普通文字</span></div>
+        <!-- 模拟「标题代码」：没有 font[size]，靠 CSS 放大字号 -->
+        <div class="demo-title" style="font-size:22px;font-weight:700;border-top:2px solid #333;border-bottom:2px solid #333;padding:6px 0">战网国服</div>
+
+        <!-- 其乐的折叠块结构：.sff_collapse 容器 + _b 标题栏 + _d 内容区 -->
+        <div class="sff_collapse sff_collapsed" style="margin:10px 0">
+          <div class="sff_collapse_b" style="background:#cfe3f7;border-radius:4px;padding:6px 10px;cursor:pointer">
+            <span class="sff_collapse_t">&gt;</span> 大型限时福利的具体定义
+          </div>
+          <div class="sff_collapse_d" style="padding:8px 10px;border:1px solid #cfe3f7;border-top:0">
+            此处为折叠隐藏的内容
+          </div>
+        </div>
+        <!-- 官方结构：div.quote > blockquote → [quote] -->
+        <div class="quote">
+          <blockquote style="margin:10px 0;padding:6px 10px;border-left:3px solid #c8d2e0;color:#6b7686;background:#fafbfc">
+            这是一段引用文字，用来测试引用块的识别。
+          </blockquote>
+        </div>
+        <!-- 其乐真实标题结构：h1.KyloStylisedHeader0 → [k0] -->
+        <h1 class="KyloStylisedHeader0" style="font-size:24px;border-top:2px solid #333;border-bottom:2px solid #333;padding:6px 0">战网国服</h1>
+        <!-- 以及 class 形如 k0 的写法 -->
+        <div class="k0" style="font-size:22px;font-weight:700;padding:6px 0">育碧</div>
+        <!-- 官方结构：ul → [list] -->
+        <ul><li>列表项一</li><li>列表项二</li></ul>
+      </div>
+      <div class="hint" style="margin:10px 0 0">
+        试试用鼠标选中上面任意一段<b>带格式</b>的文字 —— 选区右下角会冒出「吸取样式」浮标，点它能读出这段的 BBCode 并存成样式。
+      </div>
+      <div class="fr">
+        <div style="font-size:12px;color:#98a2b3;margin-bottom:6px">快速回复（这是 Discuz 在帖子页的回复框）</div>
+        <textarea id="fastpostmessage" name="message" rows="4" style="width:100%;padding:8px;border:1px solid #d6dce5;border-radius:5px"></textarea>
+        <div style="margin-top:8px"><button type="button" style="padding:5px 14px;border:1px solid #c9d6e8;background:#fff;color:#2f6fb5;border-radius:4px">回复</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ---------- 模拟 Discuz 编辑器运行环境 ---------- */
+  var editorid = 'e';
+  var wysiwyg = 0;
+  var textobj = document.getElementById('e');
+  function switchEditor(mode) {
+    if (mode == wysiwyg) return;
+    wysiwyg = mode;
+    document.getElementById('e').style.display = mode ? 'none' : '';
+    document.getElementById('e_iframe').style.display = mode ? '' : 'none';
+    document.getElementById('mode').textContent = mode ? '所见即所得' : '纯文本';
+    document.getElementById('btnMode').textContent = mode ? '切换到纯文本' : '切换到所见即所得';
+    if (window.KLSP) window.KLSP.rebuild();
+  }
+
+  /* ---------- 场景切换（脚本靠 URL 里的 mod=post 判断） ---------- */
+  var isPost = /[?&]mod=post/.test(location.search);
+  function applyScene() {
+    document.getElementById('scenePost').style.display = isPost ? '' : 'none';
+    document.getElementById('sceneView').style.display = isPost ? 'none' : '';
+    document.getElementById('btnScenePost').className = isPost ? 'on' : '';
+    document.getElementById('btnSceneView').className = isPost ? '' : 'on';
+    document.getElementById('sceneHint').innerHTML = isPost
+      ? '当前模拟<b>发帖页</b>（URL 带 <code>mod=post</code>）——脚本应当注入左侧样式面板。选中文字点样式＝套用标签；不选直接点＝插入空标签、光标停在中间。'
+      : '当前模拟<b>浏览帖子页</b>（URL 不带 <code>mod=post</code>）——按设计<b>不会出现样式面板</b>，快速回复框也不会被接管；但<b>选中帖子正文里带格式的文字</b>，右下角会冒出「吸取样式」浮标，点它就能把别人的格式读成自己的样式。';
+  }
+  document.getElementById('btnScenePost').onclick = function () { location.search = '?mod=post&action=newthread'; };
+  document.getElementById('btnSceneView').onclick = function () { location.search = ''; };
+  document.getElementById('btnMode').onclick = function () { switchEditor(wysiwyg ? 0 : 1); };
+
+  /* ---------- 样式：示例 / 清空（脚本本身不含任何预设） ---------- */
+  var EX = [
+    {group:'标题',name:'大标题',open:'[size=5][b]',close:'[/b][/size]',block:true,preview:{bold:true,size:'17px'}},
+    {group:'标题',name:'小标题',open:'[size=4][b]',close:'[/b][/size]',block:true,preview:{bold:true,size:'15px'}},
+    {group:'强调',name:'加粗',open:'[b]',close:'[/b]',preview:{bold:true}},
+    {group:'强调',name:'斜体',open:'[i]',close:'[/i]',preview:{italic:true}},
+    {group:'强调',name:'下划线',open:'[u]',close:'[/u]',preview:{underline:true}},
+    {group:'颜色',name:'红色',open:'[color=#c0392b]',close:'[/color]',preview:{color:'#c0392b'}},
+    {group:'区块',name:'引用',open:'[quote]',close:'[/quote]',block:true},
+    {group:'区块',name:'代码',open:'[code]',close:'[/code]',block:true,preview:{mono:true}},
+    {group:'区块',name:'剧透',open:'[hide]',close:'[/hide]',block:true},
+    {group:'区块',name:'分隔线',open:'[hr]',close:'',block:true},
+    {group:'工具',name:'清除格式',action:'clear'}
+  ];
+  function writeStyles(list) {
+    localStorage.setItem('klsp:styles', JSON.stringify(list));
+    if (window.KLSP) window.KLSP.rebuild();
+  }
+  document.getElementById('btnLoadEx').onclick = function () {
+    writeStyles(EX.map(function (e, i) {
+      return Object.assign({ id: 'ex' + i, hotkey: '', action: 'wrap', preview: {} }, e);
+    }));
+  };
+  document.getElementById('btnClearEx').onclick = function () { writeStyles([]); };
+
+  /* ---------- 极简 BBCode 渲染，仅用于预览 ---------- */
+  function bbcode2html(s) {
+    return s
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/g, '<b>$1</b>')
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/g, '<i>$1</i>')
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/g, '<u>$1</u>')
+      .replace(/\[strike\]([\s\S]*?)\[\/strike\]/g, '<s>$1</s>')
+      .replace(/\[size=(\d)\]([\s\S]*?)\[\/size\]/g, function (m, n, t) { return '<span style="font-size:' + (10 + n * 2) + 'px">' + t + '</span>'; })
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/g, '<span style="color:$1">$2</span>')
+      .replace(/\[backcolor=([^\]]+)\]([\s\S]*?)\[\/backcolor\]/g, '<span style="background:$1">$2</span>')
+      .replace(/\[quote\]([\s\S]*?)\[\/quote\]/g, '<blockquote style="margin:6px 0;padding:6px 10px;border-left:3px solid #c8d2e0;color:#6b7686;background:#fafbfc">$1</blockquote>')
+      .replace(/\[code\]([\s\S]*?)\[\/code\]/g, '<pre style="background:#f2f4f7;padding:8px;border-radius:4px">$1</pre>')
+      .replace(/\[hide\]([\s\S]*?)\[\/hide\]/g, '<span style="background:#eee;color:#999">［隐藏内容］$1</span>')
+      .replace(/\[align=center\]([\s\S]*?)\[\/align\]/g, '<div style="text-align:center">$1</div>')
+      .replace(/\[list\]([\s\S]*?)\[\/list\]/g, function (m, t) { return '<ul>' + t.replace(/\[\*\]/g, '<li>').replace(/<\/li>/g, '') + '</ul>'; })
+      .replace(/\[hr\]/g, '<hr>')
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/g, '<a href="$1">$2</a>')
+      .replace(/\[url\]([\s\S]*?)\[\/url\]/g, '<a href="$1">$1</a>')
+      .replace(/\n/g, '<br>');
+  }
+  function refresh() {
+    var v = textobj.value;
+    document.getElementById('src').textContent = v;
+    document.getElementById('preview').innerHTML = bbcode2html(v);
+  }
+  textobj.addEventListener('input', refresh);
+  textobj.addEventListener('change', refresh);
+  refresh();
+  applyScene();
+</script>
+
+<script src="../Keylol样式面板.user.js"></script>
+</body>
+</html>
